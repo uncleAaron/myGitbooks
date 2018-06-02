@@ -442,5 +442,35 @@ happens-before是JMM最核心的概念。对于程序员来说，理解happens-b
 
 ### 7.2. happens-before的定义
 
-+ 如果一个操作happens-before 另一个操作，那么第一个操作的执行结果将对第二个操作可见，而且第一个操作的执行顺序排在第二个操作之前。
-+ 两个操作之间存在happens-before 关系，并不意味着执行顺序一定是happens-before指定的顺序。
++ 如果一个操作happens-before 另一个操作，那么第一个操作的执行结果将对第二个操作可见，而且第一个操作的执行顺序排在第二个操作之前。（JMM对程序员的保证）
++ 两个操作之间存在happens-before 关系，并不意味着执行顺序一定是happens-before指定的顺序。（JMM对编译器和处理器的保证）
+
+### 7.3. as-if-serial
+
++ as-if-serial保证单线程内程序的执行结果不改变，happens-before关系保证了多线程程序执行结果不被改变。
++ as-if-serial让程序员感受到单线程程序是按照程序的顺序执行的，happens-before让程序员感觉正确同步的多线程程序是按照happens-before指定的顺序来执行的。
+
+
+
+### 7.4. happens-before规则
+
+- **程序顺序规则**：一个线程中的**每个操作**，**happens-before于**该线程中的任意**后续操作**。（同一线程内顺序排序）
+- **监视器锁规则**：对一个锁的**解锁**，**happens-before于**随后对其**加锁**。（解锁-->加锁）（解锁的写入一定能被加锁的线程看到）
+- **volatile变量规则**：对一个**volatile域的写**，**happens-before于**任意后续对这个**volatile域的读**。（写-->读）
+- **传递性**：如果A happens-before B，且B happens-before C，那么A happens-before C
+- **start()规则**：如果线程A执行操作ThreadB.start()（启动线程B），那么**A线程的ThreadB.start()操作happens-before于线程B中的任意操作**。
+- **join()规则**：如果线程A执行操作ThreadB.join()并成功返回，那么**线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回**。
+
+
+
+## 八、双重检查锁定与延迟初始化
+
+## 九、JMM综述
+
+JMM是语言级的内存模型，处理器内存模型是硬件及的内存模型（更弱）。
+
+### 9.1. JMM的内存可见性保证：
+
++ 单线程程序：单线程程序不会出现内存可见性问题。
++ 正确同步的多线程程序：正确同步的多线程程序的执行见具有顺序一致性（程序的执行结果与顺序一致性内存模型中的结果相同）（JMM用限制重排序来保证）
++ 未同步/未正确同步的多线程程序：最小安全性保障：线程执行时读取到的值，要么是之前某个线程写入的值，要么是默认值（0，null，false）
